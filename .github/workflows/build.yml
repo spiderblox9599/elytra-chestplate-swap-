@@ -12,19 +12,20 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Extract Specific ZIP File
+      - name: Extract All Files Safely
         run: |
-          # Aapki file ke special characters ko handle karke unzip karne ka command
           sudo apt-get install unzip
-          unzip -o "Spiderblox's Elytra Swap 1.21.11.zip" || unzip -o *.zip || true
+          # Kisi bhi zip file ko poori tarah unzip karne ka command
+          find . -name "*.zip" -exec unzip -o {} \;
           
-          # Zip ke andar ke sahi folder me jaakar files ko bahar nikalna
-          if [ -d "ElytraSwap" ]; then
-            cp -r ElytraSwap/* .
-          elif [ -d "Spiderblox's Elytra Swap 1.21.11" ]; then
-            cp -r "Spiderblox's Elytra Swap 1.21.11"/* .
-          fi
-          
+          # Agar files kisi andar wale folder me hain, to unhe root me lana
+          find . -maxdepth 3 -name "build.gradle" | while read -r line; do
+            dir=$(dirname "$line")
+            if [ "$dir" != "." ]; then
+              cp -r "$dir"/* .
+            fi
+          done
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
