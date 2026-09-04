@@ -5,19 +5,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+          
+      - name: Unzip Project Files
+        run: |
+          # Agar aapki file ka naam lowercase me hai ya koi bhi zip hai, use dhoond kar unzip karega
+          unzip -o *.zip
+          
       - name: Build Jar File
         run: |
-          cd ElytraSwap
+          # Yeh automatic sahi folder ke andar jaakar build command chalayega
+          cd **/gradlew/.. || cd * || true
           chmod +x gradlew
           ./gradlew build
+          
       - name: Download Your Mod
         uses: actions/upload-artifact@v4
         with:
           name: Minecraft-Mod-Jar
-          path: ElytraSwap/build/libs/*.jar
-
+          path: "**/build/libs/*.jar"
