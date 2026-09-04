@@ -1,4 +1,4 @@
-name: Phone Mod Builder
+name: Final Phone Mod Builder
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -11,19 +11,28 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          
-      - name: Unzip Project Files
+
+      - name: Extract Specific ZIP File
         run: |
-          # Agar aapki file ka naam lowercase me hai ya koi bhi zip hai, use dhoond kar unzip karega
-          unzip -o *.zip
+          # Aapki file ke special characters ko handle karke unzip karne ka command
+          sudo apt-get install unzip
+          unzip -o "Spiderblox's Elytra Swap 1.21.11.zip" || unzip -o *.zip || true
           
+          # Zip ke andar ke sahi folder me jaakar files ko bahar nikalna
+          if [ -d "ElytraSwap" ]; then
+            cp -r ElytraSwap/* .
+          elif [ -d "Spiderblox's Elytra Swap 1.21.11" ]; then
+            cp -r "Spiderblox's Elytra Swap 1.21.11"/* .
+          fi
+          
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build Jar File
         run: |
-          # Yeh automatic sahi folder ke andar jaakar build command chalayega
-          cd **/gradlew/.. || cd * || true
           chmod +x gradlew
           ./gradlew build
-          
+
       - name: Download Your Mod
         uses: actions/upload-artifact@v4
         with:
